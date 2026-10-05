@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a84ff">
+<link rel="manifest" href="manifest.json">
+<title>My Invoice</title>
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+<header><h1>My Invoice</h1><p>Simple invoice management</p></header>
+<main>
+
+<section id="home" class="screen active">
+<div class="hero"><h2>Create your next invoice</h2><p>Enter this week's work, review the total, then generate a professional invoice.</p><button id="homeNew" style="background:#fff;color:#0a84ff">+ New Invoice</button><button id="homeContinue" style="display:none;margin-top:10px;background:rgba(255,255,255,.22);color:#fff">Continue unfinished invoice</button></div>
+<div class="menu">
+<button onclick="show('invoices')"><span><span class="icon">📄</span><b>Invoices</b><span class="sub">View saved invoices</span></span><span>›</span></button>
+<button onclick="show('settings')"><span><span class="icon">⚙️</span><b>Settings</b><span class="sub">Your details and payment information</span></span><span>›</span></button>
+</div>
+</section>
+
+<section id="new" class="screen">
+<div class="topbar"><button class="back" onclick="show('home')">‹ Back</button><h2>New Invoice</h2></div>
+<div class="card">
+<div class="section-title">Invoice Details</div>
+<div class="grid">
+<div><label>Invoice Prefix</label><input id="prefix" placeholder="e.g. MMALAM#"></div>
+<div><label>Invoice Number</label><input id="invNo" type="number" min="1"></div>
+<div class="full"><label>Invoice Date</label><input id="invDate" type="date"></div>
+<div><label>Invoice Period From</label><input id="periodFrom" type="date"></div>
+<div><label>Invoice Period To</label><input id="periodTo" type="date"></div>
+</div>
+<div class="section-title">Work Details</div>
+<div id="entries"></div>
+<button class="secondary" id="addEntry">+ Add Work Entry</button>
+</div>
+<div class="card">
+<div class="summary"><div class="stat"><small>Total Hours</small><b id="sumHours">0.00</b></div><div class="stat"><small>Total Amount</small><b id="sumAmount">$0.00</b></div></div>
+<div class="notice warn" id="newMsg" style="display:none;margin-top:12px"></div>
+<br><button id="review" class="green">Review Invoice</button>
+</div>
+</section>
+
+<section id="reviewScreen" class="screen">
+<div class="topbar"><button class="back" onclick="show('new')">‹ Back</button><h2>Invoice Summary</h2></div>
+<div class="card">
+<div class="summary">
+<div class="stat"><small>Invoice No.</small><b id="rNo"></b></div>
+<div class="stat"><small>Invoice Date</small><b id="rDate"></b></div>
+<div class="stat"><small>Invoice Period</small><b id="rPeriod"></b></div>
+<div class="stat"><small>Company</small><b id="rCompany"></b></div><div class="stat"><small>Attn</small><b id="rAttn"></b></div>
+<div class="stat"><small>Total Hours</small><b id="rHours"></b></div>
+<div class="stat full"><small>Total Amount</small><b id="rTotal"></b></div>
+</div>
+</div>
+<div class="notice warn" id="reviewWarn" style="display:none"></div>
+<div class="card"><div class="section-title">Work Entries</div><div id="reviewEntries"></div></div>
+<div class="card"><button class="green" id="generate">Generate Invoice</button></div>
+</section>
+
+<section id="preview" class="screen printable">
+<div class="topbar no-print"><button class="back" onclick="show('reviewScreen')">‹ Back</button><h2>Invoice Preview</h2></div>
+<div class="card"><div class="small no-print" style="text-align:center;margin:0 0 10px">Tap the invoice to zoom in or out</div><div class="invoice-preview" id="invoicePreview"></div></div>
+<div class="card no-print actions"><button id="printPdf" class="green">Save / Share PDF</button><button id="saveInvoice" class="secondary">Save Invoice</button></div>
+</section>
+
+<section id="invoices" class="screen">
+<div class="topbar"><button class="back" onclick="show('home')">‹ Back</button><h2>Invoices</h2></div>
+<div class="card"><div id="invoiceList"></div></div>
+</section>
+
+<section id="settings" class="screen">
+<div class="topbar"><button class="back" onclick="leaveSettings()">‹ Back</button><h2>Settings</h2></div>
+<div class="card">
+<div class="notice" id="rateNotice" style="display:none;background:#fef3c7;color:#92400e">Enter your hourly rate and tap Save Changes. You will go straight back to your invoice.</div>
+<div class="notice">Permanent profile information is stored locally on this device. It is not embedded in the app files.</div>
+<div class="section-title">My Details</div>
+<div class="grid">
+<div><label>My name</label><input id="sName"></div><div><label>My ABN</label><input id="sAbn"></div>
+<div><label>Address</label><input id="sAddress"></div><div><label>Phone Number</label><input id="sPhone" type="tel" inputmode="tel"></div>
+<div><label>Company Name</label><input id="sCompany"></div><div><label>Attn</label><input id="sAttn"></div>
+<div><label>Hourly Rate ($)</label><input id="sRate" type="number" step="0.01" placeholder="Enter rate"></div>
+</div>
+<div class="section-title">Payment Details</div>
+<div class="grid">
+<div><label>Bank Name</label><input id="sBank"></div><div><label>Branch Address</label><input id="sBranch"></div>
+<div><label>Account Name</label><input id="sAccountName"></div><div><label>BSB</label><input id="sBsb" inputmode="numeric"></div>
+<div class="full"><label>Account Number</label><input id="sAccountNumber" inputmode="numeric"></div>
+</div><br><button id="saveSettings">Save Changes</button>
+</div>
+<div class="card">
+<div class="section-title">Backup & Restore</div>
+<p class="small">Export a private backup file to the iPhone Files app. Use it to restore your profile and saved invoices if browser data is ever cleared.</p>
+<div class="actions"><button id="backup" class="secondary">Export Backup</button><button id="restoreBtn" class="secondary">Restore Backup</button></div>
+<input id="restoreFile" type="file" accept=".json,application/json" style="display:none">
+</div>
+</section>
+
+</main>
+<nav class="nav"><div class="nav-inner">
+<button id="navHome" class="active" onclick="show('home')">⌂<br>Home</button>
+<button id="navInvoices" onclick="show('invoices')">▤<br>Invoices</button>
+<button id="navSettings" onclick="show('settings')">⚙<br>Settings</button>
+</div></nav>
+
+<script src="invoice-pdf.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body></html>
